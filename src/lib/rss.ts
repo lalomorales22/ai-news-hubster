@@ -1,7 +1,3 @@
-import Parser from 'rss-parser';
-
-const parser = new Parser();
-
 export type FeedItem = {
   title: string;
   link: string;
@@ -36,16 +32,27 @@ export const CATEGORIES = {
 
 export async function fetchRSSFeed(url: string): Promise<FeedItem[]> {
   try {
-    const feed = await parser.parseURL(url);
-    return feed.items.map(item => ({
-      title: item.title || '',
-      link: item.link || '',
-      content: item.content || item.description || '',
-      contentSnippet: item.contentSnippet || '',
-      isoDate: item.isoDate,
-      categories: item.categories,
-      creator: item.creator,
-      source: feed.title || url,
+    // Use a CORS proxy to fetch RSS feeds
+    const corsProxy = 'https://api.allorigins.win/raw?url=';
+    const response = await fetch(corsProxy + encodeURIComponent(url));
+    if (!response.ok) throw new Error('Network response was not ok');
+    
+    const text = await response.text();
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(text, 'text/xml');
+    
+    const items = Array.from(xmlDoc.querySelectorAll('item'));
+    const feedTitle = xmlDoc.querySelector('channel > title')?.textContent || url;
+    
+    return items.map(item => ({
+      title: item.querySelector('title')?.textContent || '',
+      link: item.querySelector('link')?.textContent || '',
+      content: item.querySelector('description')?.textContent || '',
+      contentSnippet: item.querySelector('description')?.textContent?.slice(0, 200) || '',
+      isoDate: item.querySelector('pubDate')?.textContent || '',
+      categories: Array.from(item.querySelectorAll('category')).map(cat => cat.textContent || ''),
+      creator: item.querySelector('dc\\:creator, creator')?.textContent || '',
+      source: feedTitle,
     }));
   } catch (error) {
     console.error(`Error fetching RSS feed from ${url}:`, error);
