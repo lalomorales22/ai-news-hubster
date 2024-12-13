@@ -10,6 +10,7 @@ export type FeedItem = {
 };
 
 export const RSS_FEED_URLS = [
+  // Existing feeds
   'https://tldr.tech/api/rss/tech',
   'http://feeds.feedburner.com/TechCrunch/',
   'https://techcrunch.com/feed/',
@@ -20,6 +21,14 @@ export const RSS_FEED_URLS = [
   'https://news.mit.edu/rss/topic/algorithms',
   'https://news.mit.edu/rss/topic/computing',
   'https://news.mit.edu/rss/topic/human-computer-interaction',
+  
+  // New RSS feeds
+  'https://venturebeat.com/feed/',
+  'https://www.wired.com/category/gear/feed/',
+  'https://www.zdnet.com/topic/ai/feed/',
+  'https://analyticsindiamag.com/feed/',
+  'https://www.technologyreview.com/feed/',
+  'https://www.theverge.com/rss/ai/index.xml'
 ];
 
 export const CATEGORIES = {
